@@ -101,9 +101,13 @@ The asset can configure:
 - rich text;
 - timestamp visibility;
 - exception detail visibility;
+- suppression of stack traces for regular `Log` entries;
+- optional suppression of stack traces for warnings;
 - same-frame dedupe and repeated-call warnings.
 
 The package does not create a singleton, service locator, hidden bootstrap or mandatory project-wide config.
+
+Framework projects can assign this asset through `Project Settings > Immersive Framework > Logging Config`. If no asset is assigned, the Unity logger uses `Info` as the minimum level and suppresses stack traces for regular `Log` entries.
 
 ## Boundary
 

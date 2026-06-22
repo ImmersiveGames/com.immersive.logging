@@ -1,7 +1,7 @@
 {
   "name": "com.immersive.logging",
   "displayName": "Immersive Logging",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "structured and configurable logging primitives for the Immersive Framework",
   "author": {
     "name": "Immersive Games"

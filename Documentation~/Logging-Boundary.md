@@ -9,7 +9,7 @@ The package provides:
 - pure runtime logging records, fields, formatters, policies, sinks and local loggers;
 - single-line readable console output for smoke evidence;
 - configurable policy by default level, namespace prefix, owner type and optional owner attributes;
-- optional Unity adapter with console sink, formatter, `LoggingConfigAsset` and same-frame dedupe;
+- optional Unity adapter with console sink, formatter, `LoggingConfigAsset`, stack trace suppression for regular logs and same-frame dedupe;
 - no mandatory singleton or hidden global configuration.
 
 ## Runtime Assembly Rule
@@ -41,6 +41,7 @@ Allowed Unity concerns:
 - `UnityFrameDedupeLogPolicy`
 - Unity console rich text
 - Unity frame-based dedupe
+- optional stack trace suppression for regular logs and warnings
 
 ## Formatting Rule
 
@@ -50,7 +51,7 @@ Human-readable console logs should keep the complete evidence on the first line:
 [INFO][Immersive.Framework][FrameworkBootstrap] Boot succeeded. app='Game Application' route='Startup Route' scene='StartupScene'.
 ```
 
-Timestamps are optional and should not be forced into the default Unity Console view.
+Timestamps are optional and should not be forced into the default Unity Console view. Regular `Log` entries should avoid Unity stack traces by default so smoke evidence remains compact; warnings and errors may keep stack traces unless a Unity config explicitly suppresses warning traces.
 
 ## Policy Precedence
 
