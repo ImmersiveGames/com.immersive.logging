@@ -14,6 +14,7 @@ Specialized package for generic logging primitives.
 - Active API: `LogLevel`, `LogRecord`, `ILogSink`, `ILogFormatter`, `ILogPolicy`, `Logger`, `PlainTextLogFormatter`, `HumanReadableLogFormatter`, `AllowAllLogPolicy`, `RejectAllLogPolicy`, `MinimumLogLevelPolicy`, and `UnityConsoleLogSink`.
 - `Logger` is local and instantiable, not global.
 - Example composition: `Logger` + `UnityConsoleLogSink` + `HumanReadableLogFormatter` + `MinimumLogLevelPolicy`.
+- Human readable output keeps identifiers on the first line and the timestamp on the next line for easier Console scanning.
 - Configuration, profile and Inspector workflows are deferred to later cuts.
 - No framework bootstrap.
 - No singleton requirement.

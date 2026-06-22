@@ -16,22 +16,9 @@ namespace Immersive.Logging.Formatting
 
             var builder = new StringBuilder();
 
-            builder.Append(record.TimestampUtc.ToString("O", CultureInfo.InvariantCulture));
-            builder.Append(" [");
-            builder.Append(record.Level);
-            builder.Append("]");
-
-            if (!string.IsNullOrWhiteSpace(record.Category))
-            {
-                builder.Append(" category=");
-                builder.Append(record.Category);
-            }
-
-            if (!string.IsNullOrWhiteSpace(record.Context))
-            {
-                builder.Append(" context=");
-                builder.Append(record.Context);
-            }
+            AppendIdentifier(builder, record.Level.ToString());
+            AppendIdentifier(builder, record.Category);
+            AppendIdentifier(builder, record.Context);
 
             builder.AppendLine();
             builder.Append("  message: ");
@@ -43,7 +30,22 @@ namespace Immersive.Logging.Formatting
                 builder.AppendLine(record.Exception.ToString());
             }
 
+            builder.Append("timestamp: ");
+            builder.Append(record.TimestampUtc.ToString("O", CultureInfo.InvariantCulture));
+
             return builder.ToString().TrimEnd();
+        }
+
+        private static void AppendIdentifier(StringBuilder builder, string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            builder.Append('[');
+            builder.Append(value);
+            builder.Append("] ");
         }
     }
 }

@@ -30,6 +30,8 @@
 
 Example conceptual composition: `Logger` + `UnityConsoleLogSink` + `HumanReadableLogFormatter` + `MinimumLogLevelPolicy`.
 
+`HumanReadableLogFormatter` uses a bracketed identifier line followed by a separate timestamp line for better Console readability.
+
 Concrete config/profile/Inspector workflows, dedupe/throttle, framework diagnostics and framework policy layers are deferred to later cuts.
 
 ## Entry Rule
