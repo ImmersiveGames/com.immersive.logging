@@ -1,18 +1,25 @@
 using System;
 using System.Globalization;
 using System.Text;
+using Immersive.Logging.Formatting;
+using Immersive.Logging.Levels;
 using Immersive.Logging.Records;
 
-namespace Immersive.Logging.Formatting
+namespace Immersive.Logging.Unity
 {
-    public sealed class HumanReadableLogFormatter : ILogFormatter
+    public sealed class UnityConsoleLogFormatter : ILogFormatter
     {
         private readonly bool _includeTimestamp;
+        private readonly bool _useRichText;
         private readonly bool _includeExceptionDetails;
 
-        public HumanReadableLogFormatter(bool includeTimestamp = false, bool includeExceptionDetails = true)
+        public UnityConsoleLogFormatter(
+            bool includeTimestamp = false,
+            bool useRichText = false,
+            bool includeExceptionDetails = true)
         {
             _includeTimestamp = includeTimestamp;
+            _useRichText = useRichText;
             _includeExceptionDetails = includeExceptionDetails;
         }
 
@@ -24,10 +31,9 @@ namespace Immersive.Logging.Formatting
             }
 
             var builder = new StringBuilder(256);
-
-            AppendIdentifier(builder, ToDisplayLevel(record.Level.ToString()));
-            AppendIdentifier(builder, record.Category);
-            AppendIdentifier(builder, GetOwnerOrContext(record));
+            AppendIdentifier(builder, ToDisplayLevel(record.Level), GetLevelColor(record.Level));
+            AppendIdentifier(builder, record.Category, null);
+            AppendIdentifier(builder, GetOwnerOrContext(record), null);
 
             if (builder.Length > 0)
             {
@@ -62,20 +68,58 @@ namespace Immersive.Logging.Formatting
             return record.Context;
         }
 
-        private static string ToDisplayLevel(string level)
+        private static string ToDisplayLevel(LogLevel level)
         {
-            return string.IsNullOrWhiteSpace(level) ? string.Empty : level.ToUpperInvariant();
+            return level.ToString().ToUpperInvariant();
         }
 
-        private static void AppendIdentifier(StringBuilder builder, string value)
+        private string GetLevelColor(LogLevel level)
+        {
+            if (!_useRichText)
+            {
+                return null;
+            }
+
+            switch (level)
+            {
+                case LogLevel.Trace:
+                    return "#9E9E9E";
+                case LogLevel.Debug:
+                    return "#A8DEED";
+                case LogLevel.Info:
+                    return "#FFFFFF";
+                case LogLevel.Warning:
+                    return "#FFD54F";
+                case LogLevel.Error:
+                case LogLevel.Fatal:
+                    return "#FF6B6B";
+                default:
+                    return null;
+            }
+        }
+
+        private void AppendIdentifier(StringBuilder builder, string value, string color)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
                 return;
             }
 
+            string trimmed = value.Trim();
+            if (_useRichText && !string.IsNullOrWhiteSpace(color))
+            {
+                builder.Append("<color=");
+                builder.Append(color);
+                builder.Append(">");
+                builder.Append('[');
+                builder.Append(trimmed);
+                builder.Append(']');
+                builder.Append("</color>");
+                return;
+            }
+
             builder.Append('[');
-            builder.Append(value.Trim());
+            builder.Append(trimmed);
             builder.Append(']');
         }
 

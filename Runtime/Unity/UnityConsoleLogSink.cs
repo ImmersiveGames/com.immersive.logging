@@ -11,9 +11,9 @@ namespace Immersive.Logging.Unity
     {
         private readonly ILogFormatter _formatter;
 
-        public UnityConsoleLogSink(ILogFormatter formatter)
+        public UnityConsoleLogSink(ILogFormatter formatter = null)
         {
-            _formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
+            _formatter = formatter ?? new UnityConsoleLogFormatter();
         }
 
         public void Write(LogRecord record)

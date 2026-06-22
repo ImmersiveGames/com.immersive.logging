@@ -1,65 +1,74 @@
 # Logging Boundary
 
-`com.immersive.logging` is a specialized package for generic logging primitives.
+`com.immersive.logging` is the generic logging package used by Immersive Framework modules.
 
-## Logging v0 Freeze
+## Current Contract
 
-- Runtime primitives are frozen: `LogLevel`, `LogRecord`, `ILogSink`, `ILogFormatter`, `ILogPolicy`, `Logger`.
-- Basic runtime implementations are frozen: `PlainTextLogFormatter`, `HumanReadableLogFormatter`, `AllowAllLogPolicy`, `RejectAllLogPolicy`, `MinimumLogLevelPolicy`.
-- `UnityConsoleLogSink` is frozen as the current optional Unity adapter in a separate assembly.
+The package provides:
 
-## Active Runtime Primitives
+- pure runtime logging records, fields, formatters, policies, sinks and local loggers;
+- single-line readable console output for smoke evidence;
+- configurable policy by default level, namespace prefix, owner type and optional owner attributes;
+- optional Unity adapter with console sink, formatter, `LoggingConfigAsset` and same-frame dedupe;
+- no mandatory singleton or hidden global configuration.
+
+## Runtime Assembly Rule
+
+`Immersive.Logging.Runtime` has `noEngineReferences: true` and must not reference `UnityEngine`.
+
+Allowed runtime concepts:
 
 - `LogLevel`
+- `LogLevelAttribute`
 - `LogRecord`
+- `LogField`
+- `Logger`
+- `ScopedLogger`
 - `ILogSink`
 - `ILogFormatter`
 - `ILogPolicy`
-- `PlainTextLogFormatter`
-- `HumanReadableLogFormatter`
-- `AllowAllLogPolicy`
-- `RejectAllLogPolicy`
-- `MinimumLogLevelPolicy`
-- instantiable `Logger`
+- generic policies and formatters
 
-`Logger` is local and instantiable, not global.
+## Unity Adapter Rule
 
-`Immersive.Logging.Runtime` stays pure (`noEngineReferences: true`) and does not reference `UnityEngine`.
+Unity-specific behavior stays under `Runtime/Unity` in `Immersive.Logging.Unity`.
 
-`UnityConsoleLogSink` is an optional Unity adapter in a separate assembly.
+Allowed Unity concerns:
 
-Example conceptual composition: `Logger` + `UnityConsoleLogSink` + `HumanReadableLogFormatter` + `MinimumLogLevelPolicy`.
+- `UnityConsoleLogSink`
+- `UnityConsoleLogFormatter`
+- `LoggingConfigAsset`
+- `UnityFrameDedupeLogPolicy`
+- Unity console rich text
+- Unity frame-based dedupe
 
-`HumanReadableLogFormatter` uses a bracketed identifier line followed by a separate timestamp line for better Console readability.
+## Formatting Rule
 
-Concrete config/profile/Inspector workflows, dedupe/throttle, framework diagnostics and framework policy layers are deferred to later cuts.
+Human-readable console logs should keep the complete evidence on the first line:
 
-## Entry Rule
+```txt
+[INFO][Immersive.Framework][FrameworkBootstrap] Boot succeeded. app='Game Application' route='Startup Route' scene='StartupScene'.
+```
 
-- Only generic logging concerns enter this package.
-- No `Session`, `Route`, `Activity`, `Actor`, `Input`, `Camera`, `Save`, or `Pooling` semantics.
-- No framework bootstrap or service locator.
-- No mandatory singleton or hidden global config.
-- No mandatory `ScriptableObject` configuration.
-- No framework-specific diagnostics.
-- No Strict/Release policy.
-- No degraded mode policy from framework core.
+Timestamps are optional and should not be forced into the default Unity Console view.
+
+## Policy Precedence
+
+When using `ConfigurableLogPolicy`, the resolution order is:
+
+1. type rule;
+2. namespace/category longest-prefix rule;
+3. `LogLevelAttribute` on owner type, when enabled;
+4. default minimum level.
 
 ## Explicitly Out of Scope
 
-- `DebugUtility` monolith
-- `HardFailFastH1`
-- `DegradedModeReporter`
-- `RuntimeModeConfig`
-- `RuntimeConfigRegistry`
-- mandatory `LoggingConfigAsset`
-- automatic bootstrap
-- mandatory singleton
-- service locator
-- hidden global config
-- tags specific to `Session`, `Route`, `Activity`, `Actor`, `Input`, `Camera`, `Save`, or `Pooling`
-- config/profile/Inspector authoring
-- dedupe/throttle
-- framework-specific diagnostics
-- Strict/Release policy
-- degraded mode from framework core
+- old `DebugUtility` monolith;
+- `HardFailFastH1`;
+- framework bootstrap;
+- service locator;
+- mandatory singleton;
+- hidden global config;
+- module-specific tags for Session, Route, Activity, Actor, Input, Camera, Save or Pooling;
+- degraded mode policy;
+- framework-specific diagnostics.
