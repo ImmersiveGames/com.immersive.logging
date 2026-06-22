@@ -17,7 +17,15 @@ namespace Immersive.Logging.Unity
                 ? config.CreatePolicy()
                 : new ConfigurableLogPolicy(true, LogLevel.Info);
 
-            return new Logger(new UnityConsoleLogSink(formatter), policy);
+            bool suppressStandardLogStackTrace = config == null || config.SuppressStandardLogStackTrace;
+            bool suppressWarningStackTrace = config != null && config.SuppressWarningStackTrace;
+
+            return new Logger(
+                new UnityConsoleLogSink(
+                    formatter,
+                    suppressStandardLogStackTrace,
+                    suppressWarningStackTrace),
+                policy);
         }
     }
 }

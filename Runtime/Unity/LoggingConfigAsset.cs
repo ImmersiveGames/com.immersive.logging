@@ -40,6 +40,10 @@ namespace Immersive.Logging.Unity
         [SerializeField] private bool useRichText = false;
         [SerializeField] private bool includeExceptionDetails = true;
 
+        [Header("Console Stack Trace")]
+        [SerializeField] private bool suppressStandardLogStackTrace = true;
+        [SerializeField] private bool suppressWarningStackTrace = false;
+
         [Header("Frame Hygiene")]
         [SerializeField] private bool deduplicateSameFrame = false;
         [SerializeField] private bool warnRepeatedSameFrame = false;
@@ -59,6 +63,10 @@ namespace Immersive.Logging.Unity
         public bool UseRichText => useRichText;
 
         public bool IncludeExceptionDetails => includeExceptionDetails;
+
+        public bool SuppressStandardLogStackTrace => suppressStandardLogStackTrace;
+
+        public bool SuppressWarningStackTrace => suppressWarningStackTrace;
 
         public bool DeduplicateSameFrame => deduplicateSameFrame;
 

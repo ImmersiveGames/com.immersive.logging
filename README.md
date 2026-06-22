@@ -101,9 +101,41 @@ The asset can configure:
 - rich text;
 - timestamp visibility;
 - exception detail visibility;
+- suppression of stack traces for regular `Log` entries;
+- optional suppression of stack traces for warnings;
 - same-frame dedupe and repeated-call warnings.
 
 The package does not create a singleton, service locator, hidden bootstrap or mandatory project-wide config.
+
+Framework projects can assign this asset through `Project Settings > Immersive Framework > Logging Config`. If no asset is assigned, the Unity logger uses `Info` as the minimum level and suppresses stack traces for regular `Log` entries.
+
+## Debug Logs
+
+Use `Debug` for lifecycle details, local callback probes and verbose diagnostics that should not appear in normal smoke evidence. Keep regular smoke output at `Info`, then raise only the namespace you need to inspect.
+
+Framework projects should configure this through `Project Settings > Immersive Framework > Logging Config` by assigning a `LoggingConfigAsset`. A typical setup is:
+
+```txt
+Default Minimum Level: Info
+
+Namespace Rules:
+- Immersive.Framework.Diagnostics = Debug
+```
+
+This keeps high-level outcomes visible:
+
+```txt
+[INFO][Immersive.Framework][FrameworkQaCanvas] QA Smoke completed. name='Standard Smoke'.
+```
+
+And shows detailed probes only when the namespace rule allows `Debug`:
+
+```txt
+[DEBUG][Immersive.Framework][RouteContentLifecycleSmokeProbe] Route Content Smoke Probe callback. phase='Entered' probe='Canonical Route Probe' route='QA Canonical Route' scene='StartupScene' object='QA_RouteContent_Canonical' localCount='1'
+```
+
+Do not create a hidden `Resources` fallback or a global singleton for this. The framework-owned configuration path is the assigned logging config in Project Settings.
+
 
 ## Boundary
 

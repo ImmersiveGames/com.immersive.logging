@@ -10,10 +10,17 @@ namespace Immersive.Logging.Unity
     public sealed class UnityConsoleLogSink : ILogSink
     {
         private readonly ILogFormatter _formatter;
+        private readonly bool _suppressStandardLogStackTrace;
+        private readonly bool _suppressWarningStackTrace;
 
-        public UnityConsoleLogSink(ILogFormatter formatter = null)
+        public UnityConsoleLogSink(
+            ILogFormatter formatter = null,
+            bool suppressStandardLogStackTrace = true,
+            bool suppressWarningStackTrace = false)
         {
             _formatter = formatter ?? new UnityConsoleLogFormatter();
+            _suppressStandardLogStackTrace = suppressStandardLogStackTrace;
+            _suppressWarningStackTrace = suppressWarningStackTrace;
         }
 
         public void Write(LogRecord record)
@@ -28,16 +35,38 @@ namespace Immersive.Logging.Unity
             switch (record.Level)
             {
                 case LogLevel.Warning:
-                    Debug.LogWarning(message);
+                    WriteWarning(message);
                     return;
                 case LogLevel.Error:
                 case LogLevel.Fatal:
                     Debug.LogError(message);
                     return;
                 default:
-                    Debug.Log(message);
+                    WriteStandardLog(message);
                     return;
             }
+        }
+
+        private void WriteStandardLog(string message)
+        {
+            if (_suppressStandardLogStackTrace)
+            {
+                Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "{0}", message);
+                return;
+            }
+
+            Debug.Log(message);
+        }
+
+        private void WriteWarning(string message)
+        {
+            if (_suppressWarningStackTrace)
+            {
+                Debug.LogFormat(LogType.Warning, LogOption.NoStacktrace, null, "{0}", message);
+                return;
+            }
+
+            Debug.LogWarning(message);
         }
     }
 }
