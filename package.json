@@ -1,11 +1,17 @@
 {
   "name": "com.immersive.logging",
   "displayName": "Immersive Logging",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "structured and configurable logging primitives for the Immersive Framework",
-  "author": {
-    "name": "Immersive Games"
-  },
   "unity": "6000.5",
-  "unityRelease": "0f1"
+  "unityRelease": "0f1",
+  "license": "MIT",
+  "licensesUrl": "https://github.com/ImmersiveGames/com.immersive.logging/blob/main/LICENSE.md",
+  "documentationUrl": "https://github.com/ImmersiveGames/com.immersive.logging#readme",
+  "changelogUrl": "https://github.com/ImmersiveGames/com.immersive.logging/blob/main/CHANGELOG.md",
+  "author": {
+    "name": "Immersive Games",
+    "url": "http://www.immersivegame.com.br",
+    "email": "contato@immersivegames.com.br"
+  }
 }

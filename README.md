@@ -2,6 +2,13 @@
 
 Structured and configurable logging package for Immersive Framework modules.
 
+## Installation
+
+Configure OpenUPM for the `com.immersive` scope and add
+`com.immersive.logging` version `0.2.2` to `Packages/manifest.json`.
+
+Git fallback: `https://github.com/ImmersiveGames/com.immersive.logging.git#v0.2.2`.
+
 ## Current Shape
 
 `Immersive.Logging.Runtime` stays pure and does not reference `UnityEngine`.
@@ -140,3 +147,7 @@ Do not create a hidden `Resources` fallback or a global singleton for this. The 
 ## Boundary
 
 This package contains only generic logging concerns. It must not include `Session`, `Route`, `Activity`, `Actor`, `Input`, `Camera`, `Save`, `Pooling`, framework bootstrap, degraded mode, hard-fail policy, or module-specific tags.
+
+## License
+
+Licensed under the [MIT License](LICENSE.md).
