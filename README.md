@@ -5,9 +5,9 @@ Structured and configurable logging package for Immersive Framework modules.
 ## Installation
 
 Configure OpenUPM for the `com.immersive` scope and add
-`com.immersive.logging` version `0.2.2` to `Packages/manifest.json`.
+`com.immersive.logging` version `0.2.3` to `Packages/manifest.json`.
 
-Git fallback: `https://github.com/ImmersiveGames/com.immersive.logging.git#v0.2.2`.
+Git fallback: `https://github.com/ImmersiveGames/com.immersive.logging.git#v0.2.3`.
 
 ## Current Shape
 
