@@ -4,10 +4,7 @@ Structured and configurable logging package for Immersive Framework modules.
 
 ## Installation
 
-Configure OpenUPM for the `com.immersive` scope and add
-`com.immersive.logging` version `0.2.3` to `Packages/manifest.json`.
-
-Git fallback: `https://github.com/ImmersiveGames/com.immersive.logging.git#v0.2.3`.
+Use the package source already configured by the consuming project. Resolve the installed version from `Packages/manifest.json` and `packages-lock.json`; this README does not pin a version for discovery.
 
 ## Current Shape
 
@@ -143,10 +140,55 @@ And shows detailed probes only when the namespace rule allows `Debug`:
 
 Do not create a hidden `Resources` fallback or a global singleton for this. The framework-owned configuration path is the assigned logging config in Project Settings.
 
+## Compose logging in a Unity component
+
+Create a `LoggingConfigAsset` from the menu above. Configure the default minimum level and enabled namespace/type rules on the asset; `LoggingConfigAsset.CreatePolicy()` builds the configured policy (and optional same-frame deduplication), while `CreateFormatter()` builds the Unity formatter. Pass the asset to `UnityLoggingFactory.CreateLogger` to apply both to the logger and its Unity console sink.
+
+```csharp
+using Immersive.Logging.Loggers;
+using Immersive.Logging.Unity;
+using UnityEngine;
+
+public sealed class MatchPresenter : MonoBehaviour
+{
+    [SerializeField] private LoggingConfigAsset loggingConfig;
+
+    private ScopedLogger _log;
+
+    private void Awake()
+    {
+        Logger logger = UnityLoggingFactory.CreateLogger(loggingConfig);
+        _log = logger.For<MatchPresenter>("Game.Match");
+    }
+
+    private void Start()
+    {
+        _log.Info("Match presenter ready.");
+    }
+
+    private void OnDestroy()
+    {
+        // Logger and ScopedLogger own no disposable resources or subscriptions.
+        _log = null;
+    }
+}
+```
+
+The logger has no cleanup API: it retains its sink and policy but owns no disposable subscription. A null config is supported and uses the default Unity formatter and an enabled `Info` minimum-level policy. A supplied config controls enabled state, level rules, formatter options, stack-trace behavior, and optional deduplication. A missing assigned asset therefore selects documented defaults; it does not load a hidden asset. Verify by logging at `Info` and `Debug`, then adjust the asset's default level or `Game.Match` namespace rule and confirm the Console filtering/format. Duplicate rules produce Inspector warnings from `LoggingConfigAsset.OnValidate`.
+
+## Capability navigation
+
+| Intent | Procedure/API | Validation |
+|---|---|---|
+| Log from a Unity component | [Unity composition example](#compose-logging-in-a-unity-component), `UnityLoggingFactory`, `Logger`, `ScopedLogger` | Unity Console with configured level and namespace rule |
+| Add structured fields | [Scoped logger example](#scoped-logger-example), `LogFields` | Inspect formatted Console record |
+| Filter by level, namespace, or type | [Policy example](#policy-example), `LoggingConfigAsset` | Test allowed and filtered levels; inspect duplicate-rule warnings |
+| Understand assembly ownership and exclusions | [Logging Boundary](Documentation~/Logging-Boundary.md) | Static assembly/API review |
+
 
 ## Boundary
 
-This package contains only generic logging concerns. It must not include `Session`, `Route`, `Activity`, `Actor`, `Input`, `Camera`, `Save`, `Pooling`, framework bootstrap, degraded mode, hard-fail policy, or module-specific tags.
+This package contains generic logging primitives plus a Unity adapter. It does not provide game/framework lifecycle, global configuration, singleton bootstrap, pooling, or automatic project-wide setup. See [Logging Boundary](Documentation~/Logging-Boundary.md) for assembly boundaries and exclusions.
 
 ## License
 

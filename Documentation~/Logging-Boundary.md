@@ -1,75 +1,19 @@
 # Logging Boundary
 
-`com.immersive.logging` is the generic logging package used by Immersive Framework modules.
+`com.immersive.logging` is a reusable logging package with a pure runtime and an optional Unity adapter. The [README](../README.md) is the canonical consumer guide for APIs, policy authoring, composition, and validation.
 
-## Current Contract
+## Assembly ownership
 
-The package provides:
+- `Immersive.Logging.Runtime` (`noEngineReferences: true`) owns records, fields, loggers, formatter/policy/sink contracts, and engine-independent implementations.
+- `Immersive.Logging.Unity` owns Unity Console output, `LoggingConfigAsset`, Unity formatting, stack-trace options, frame deduplication, and `UnityLoggingFactory`.
+- Editor-only validation/authoring behavior remains outside the pure runtime assembly.
 
-- pure runtime logging records, fields, formatters, policies, sinks and local loggers;
-- single-line readable console output for smoke evidence;
-- configurable policy by default level, namespace prefix, owner type and optional owner attributes;
-- optional Unity adapter with console sink, formatter, `LoggingConfigAsset`, stack trace suppression for regular logs and same-frame dedupe;
-- no mandatory singleton or hidden global configuration.
+## Composition and lifetime
 
-## Runtime Assembly Rule
+The consumer creates a `Logger` or calls `UnityLoggingFactory.CreateLogger(config)`, then scopes it with `Logger.For<T>()` or `For(Type)`. The logger retains its sink and policy; `ScopedLogger` retains its logger and owner metadata. Neither exposes cleanup/disposal because these objects own no external subscriptions or disposable resources. Configuration is explicit; there is no global registry, singleton, mandatory asset, or hidden bootstrap.
 
-`Immersive.Logging.Runtime` has `noEngineReferences: true` and must not reference `UnityEngine`.
+## Policy boundary
 
-Allowed runtime concepts:
+The consumer-provided/config-authored policy decides whether a `LogRecord` reaches its sink. Namespace rules use longest-prefix matching; type rules take precedence over namespace rules; `LogLevelAttribute` is considered when enabled and no explicit matching type/namespace rule applies. Unity Console behavior belongs to the adapter, not the pure runtime.
 
-- `LogLevel`
-- `LogLevelAttribute`
-- `LogRecord`
-- `LogField`
-- `Logger`
-- `ScopedLogger`
-- `ILogSink`
-- `ILogFormatter`
-- `ILogPolicy`
-- generic policies and formatters
-
-## Unity Adapter Rule
-
-Unity-specific behavior stays under `Runtime/Unity` in `Immersive.Logging.Unity`.
-
-Allowed Unity concerns:
-
-- `UnityConsoleLogSink`
-- `UnityConsoleLogFormatter`
-- `LoggingConfigAsset`
-- `UnityFrameDedupeLogPolicy`
-- Unity console rich text
-- Unity frame-based dedupe
-- optional stack trace suppression for regular logs and warnings
-
-## Formatting Rule
-
-Human-readable console logs should keep the complete evidence on the first line:
-
-```txt
-[INFO][Immersive.Framework][FrameworkBootstrap] Boot succeeded. app='Game Application' route='Startup Route' scene='StartupScene'.
-```
-
-Timestamps are optional and should not be forced into the default Unity Console view. Regular `Log` entries should avoid Unity stack traces by default so smoke evidence remains compact; warnings and errors may keep stack traces unless a Unity config explicitly suppresses warning traces.
-
-## Policy Precedence
-
-When using `ConfigurableLogPolicy`, the resolution order is:
-
-1. type rule;
-2. namespace/category longest-prefix rule;
-3. `LogLevelAttribute` on owner type, when enabled;
-4. default minimum level.
-
-## Explicitly Out of Scope
-
-- old `DebugUtility` monolith;
-- `HardFailFastH1`;
-- framework bootstrap;
-- service locator;
-- mandatory singleton;
-- hidden global config;
-- module-specific tags for Session, Route, Activity, Actor, Input, Camera, Save or Pooling;
-- degraded mode policy;
-- framework-specific diagnostics.
+Framework lifecycle concepts and module-specific policy/ownership are not package responsibilities. Changes to the public API require package-level compatibility and changelog review.
